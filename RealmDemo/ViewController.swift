@@ -7,19 +7,48 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import RealmSwift
 
-class ViewController: UIViewController {
-
+class TableViewController : UITableViewController{
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+//        grabData()
+        fetchData()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func fetchData(){
+        let userData = User()
+        userData.readFromRealm()
+        
+        
     }
-
-
+    
+    func grabData(){
+        let databaseRef = Database.database().reference()
+        databaseRef.child("users").observe(.value) {
+            snapshot in
+            for snap in snapshot.children.allObjects as! [DataSnapshot]{
+                guard let dict = snap.value as? [String:AnyObject] else{
+                    return
+                }
+                let name = dict["name"] as? String
+                let age = dict["age"] as? Int
+                
+                print(name!)
+                print(age!)
+                
+                let UserToAdd = User()
+                UserToAdd.name = name
+                UserToAdd.age.value = age
+                UserToAdd.writeToRealm()
+                
+            }
+            
+        }
+    }
+    
 }
 
